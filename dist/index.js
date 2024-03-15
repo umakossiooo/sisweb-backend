@@ -4,13 +4,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const routes_1 = __importDefault(require("./src/routes"));
 const morgan = require('morgan');
+const routes_1 = __importDefault(require("./src/routes"));
+const db = require('./src/models');
 const app = (0, express_1.default)();
 const port = 3000;
+db.sequelize.sync()
+    .then(() => {
+    console.log("Synced db.");
+})
+    .catch((err) => {
+    console.error("Failed to sync db: ", err.message);
+});
 app.use(morgan('dev'));
 app.use(express_1.default.json());
 app.use(routes_1.default);
 app.listen(port, () => {
     console.log(`App listening on port ${port}`);
+});
+db.sequelize.sync({ force: true }).then(() => {
+    console.log("Drop and re-sync db.");
 });
